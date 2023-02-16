@@ -17,6 +17,7 @@ using namespace std;
 
 //Constants
 const int NAME {50};
+const int TIME {7};
 const int DESC {100};
 const int MAX {10};
 
@@ -25,7 +26,7 @@ struct event
 {
 	char name[NAME];
 	int day;
-	char time;
+	char time[TIME];
 	int length_event;
 	char desc[DESC];
 };
@@ -76,7 +77,7 @@ void read_event(event & new_event)
 	cin >> new_event.day;
 	cin.ignore(100, '\n');
 
-	cout << "What time is the event (e.g. 14:30): ";
+	cout << "What time is the event (e.g. 2:30PM): ";
 	cin >> new_event.time;
 	cin.ignore(100, '\n');
 
