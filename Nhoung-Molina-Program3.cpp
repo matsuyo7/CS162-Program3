@@ -38,7 +38,7 @@ struct event
 int menu(int pick);
 void read_event(event & to_read);
 bool repeat(char response);
-void save_event(event event_list[], int num_events);
+bool save_event(event event_list[], int num_events);
 void display_event(event & to_display);
 int load_event(event event_list[]);
 
@@ -81,7 +81,10 @@ int main()
 		//Save all events too external data file
 		else if (option == 4)
 		{
-			save_event(memory, num_events);
+			if(save_event(memory, num_events))
+				cout << "Your events have been saved" << endl;
+			else
+				cout << "Events could not save" << endl;
 		}
 		//Load from external data file
 		else if (option == 5)
@@ -157,24 +160,27 @@ bool repeat(char response)
 }
 
 //Save the events to the external data file
-void save_event(event event_list[], int num_event)
+bool save_event(event event_list[], int num_event)
 {
 	ofstream file_out;
 	file_out.open("comic_con.txt");
 	
-	if (file_out)
+	if (!file_out)
+		return false;
+
+	for (int i = 0; i < num_event; ++i)
 	{
-		for (int i = 0; i < num_event; ++i)
-		{
-			file_out << event_list[i].name << "|"
-				 << event_list[i].date << "|"
-				 << event_list[i].time << "|" 
-				 << event_list[i].length_event << "|" 
-				 << event_list[i].desc << endl;
-		}
-		file_out.close();
-		file_out.clear();
+		file_out << event_list[i].name << "|"
+			<< event_list[i].date << "|"
+			<< event_list[i].time << "|" 
+			<< event_list[i].length_event << "|" 
+			<< event_list[i].desc << endl;
 	}
+	file_out.close();
+	file_out.clear();
+
+	return true;
+
 }
 
 //Display all events
@@ -202,17 +208,23 @@ int load_event(event event_list[])
 	{
 		file_in.get(event_list[i].date, DATE, '|');
 		file_in.ignore(100, '|');
+
 		file_in >> event_list[i].time;
 		file_in.ignore(100, '|');
+
 		file_in >> event_list[i].length_event;
 		file_in.ignore(100, '|');
+
 		file_in.get(event_list[i].desc, DESC, '|');
 		file_in.ignore(100, '|');
 		++i;
 
+
 		file_in.get(event_list[i].name, NAME, '|');
 		file_in.ignore(100, '|');
-	}
+	}	
+	file_in.close();
+	file_in.clear();
 	return i;
 }
 		
