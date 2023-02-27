@@ -18,7 +18,7 @@ using namespace std;
 //Constants
 const int NAME {50};
 const int DATE {9};
-const int TIME {7};
+const int TIME {8};
 const int DESC {100};
 const int MAX {10};
 
@@ -35,12 +35,14 @@ struct event
 
 
 //Prototypes
+void welcome();
 int menu(int pick);
 void read_event(event & to_read);
 bool repeat(char response);
 bool save_event(event event_list[], int num_events);
 void display_event(event & to_display);
 int load_event(event event_list[]);
+void one_display(event display_list[], char one_event[], int num_events);
 
 int main()
 {
@@ -51,8 +53,12 @@ int main()
 	int i {0}; 		//Jump through array
 	int pick{0}; 		//User choose from menu
 	int option {0}; 	//Catch the pick from menu function
+	char one_event[NAME]; 	//Find one event to match and display
 
+	//Welcome the user
+	welcome();
 
+	//Loop until the user wants to quit
 	do
 	{	
 		//Menu that user can choose from
@@ -70,6 +76,11 @@ int main()
 
 			}
 		}
+		//Display one event if it matches
+		else if (option == 2)
+		{
+			one_display(memory, one_event, num_events);
+		}
 		//Display all the events
 		else if (option == 3)
 		{
@@ -81,10 +92,10 @@ int main()
 		//Save all events too external data file
 		else if (option == 4)
 		{
-			if(save_event(memory, num_events))
-				cout << "Your events have been saved" << endl;
+			if (save_event(memory, num_events))
+				cout << "\n-Your events have been saved-" << endl;
 			else
-				cout << "Events could not save" << endl;
+				cout << "\nEvents could not save" << endl;
 		}
 		//Load from external data file
 		else if (option == 5)
@@ -93,7 +104,7 @@ int main()
 			num_events = load_event(memory);
 			cout << "Events: " << num_events << endl;
 		}
-	} while(option != 6);
+	} while (option != 6);
 	
 	cout << "***ENDING PROGRAM***" << endl;
 	
@@ -102,10 +113,25 @@ int main()
 }
 
 //Functions
+//Welcome the user to the program and give them information
+void welcome()
+{
+	cout << "\n*** ComicCon Events ***\n"
+		<< "Keep track of events that you want to do\n"
+		<< "You can store up to 10 events\n"
+		<< "Each event stored will ask for: \n"
+		<< "\t - Event name\n"
+		<< "\t - Date\n"
+		<< "\t - Time\n"
+		<< "\t - Length of event\n"
+		<< "\t - What you want to do\n"
+	        << "You will be given options to enter new events, display all of them, display one, save, and load with the menu below" << endl;
+}
+
 //Menu to choose item
 int menu(int pick)
 {
-	cout << "*** MENU ***" << endl
+	cout << "\n*** MENU ***" << endl
 		<< "1. Enter a new event celebrity, fan favorite " << endl
 		<< "2. Find and display a match of a particulr event, celebrity, fan favorite " << endl
 		<< "3. Display all events " << endl
@@ -127,7 +153,7 @@ int menu(int pick)
 //Prompt the user to input event information
 void read_event(event & to_read)
 {
-	cout << "What is the name of the event, celebrety, or fan favorite: ";
+	cout << "\nWhat is the name of the event, celebrity, or fan favorite: ";
 	cin.get(to_read.name, NAME, '\n');
 	cin.ignore(100, '\n');
 
@@ -136,7 +162,7 @@ void read_event(event & to_read)
 	cin.ignore(100, '\n');
 
 	cout << "What time is the event (e.g. 2:30PM): ";
-	cin >> to_read.time;
+	cin.get(to_read.time, TIME, '\n');
 	cin.ignore(100, '\n');
 
 	cout << "How long is the event (minutes): ";
@@ -180,13 +206,12 @@ bool save_event(event event_list[], int num_event)
 	file_out.clear();
 
 	return true;
-
 }
 
 //Display all events
 void display_event(event & to_display)
 {
-	cout << "Event: " << to_display.name << endl
+	cout << "\nEvent: " << to_display.name << endl
 		<< "Date: " << to_display.date << endl
 		<< "Time: " << to_display.time << endl
 		<< "Event length: " << to_display.length_event << " minutes" << endl
@@ -209,14 +234,14 @@ int load_event(event event_list[])
 		file_in.get(event_list[i].date, DATE, '|');
 		file_in.ignore(100, '|');
 
-		file_in >> event_list[i].time;
+		file_in.get(event_list[i].time, TIME , '|');
 		file_in.ignore(100, '|');
 
 		file_in >> event_list[i].length_event;
 		file_in.ignore(100, '|');
 
-		file_in.get(event_list[i].desc, DESC, '|');
-		file_in.ignore(100, '|');
+		file_in.get(event_list[i].desc, DESC, '\n');
+		file_in.ignore(100, '\n');
 		++i;
 
 
@@ -228,3 +253,29 @@ int load_event(event event_list[])
 	return i;
 }
 		
+//Display one event
+void one_display(event display_list[], char one_event[], int num_event)
+{
+	int j {0};
+	cout << "\nWhat's the EXACT name of the event that you're looking for: ";
+	cin.get(one_event, NAME, '\n');
+	cin.ignore(100, '\n');
+
+	for (int i {0}; i < num_event; ++i)
+	{
+		if (strcmp(one_event, display_list[i].name) == 0)
+		{ 
+			cout << "\nEvent: " << display_list[i].name << endl
+				<< "Date: " << display_list[i].date << endl
+				<< "Time: " << display_list[i].time << endl
+				<< "Event length: " << display_list[i].length_event << " minutes" << endl
+				<< "What are you doing?: " << display_list[i].desc << endl << endl;
+			++j;
+		}
+	}
+
+	if (j == 0)
+	{
+		cout << "\n-EVENT NOT FOUND-" << endl;
+	}
+}
